@@ -8,9 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 loaded_model = joblib.load('random_forest_model.pkl')
 
-# MONGO_URI = "mongodb+srv://glycemicLoadMongo:qazQAZ@glycemicloadmongo.pckj1.mongodb.net/admin?appName=glycemicLoadMongo&retryWrites=true&loadBalanced=false&replicaSet=atlas-8bz6ha-shard-0&readPreference=primary&srvServiceName=mongodb&connectTimeoutMS=10000&w=majority&authSource=admin&authMechanism=SCRAM-SHA-1"
-# DATABASE_NAME = "glycemicLoad_db"
-# COLLECTION_NAME = "glycemicLoad_predictions"
+MONGO_URI = "mongodb+srv://glycemicLoadMongo:qazQAZ@glycemicloadmongo.pckj1.mongodb.net/admin?appName=glycemicLoadMongo&retryWrites=true&loadBalanced=false&replicaSet=atlas-8bz6ha-shard-0&readPreference=primary&srvServiceName=mongodb&connectTimeoutMS=10000&w=majority&authSource=admin&authMechanism=SCRAM-SHA-1"
+DATABASE_NAME = "glycemicLoad_db"
+COLLECTION_NAME = "glycemicLoad_predictions"
 
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
