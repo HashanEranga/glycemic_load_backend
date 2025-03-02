@@ -1,0 +1,7 @@
+fastapi
+pydantic
+numpy
+joblib
+pymongo
+uvicorn
+python-multipart
