@@ -5,3 +5,5 @@ joblib
 pymongo
 uvicorn
 python-multipart
+scikit-learn
+dotenv

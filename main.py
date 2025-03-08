@@ -1,3 +1,4 @@
+import os
 import joblib
 import numpy as np
 from fastapi import FastAPI, HTTPException, Query
@@ -5,25 +6,47 @@ from pydantic import BaseModel
 from typing import Dict
 from pymongo import MongoClient
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 
-loaded_model = joblib.load('random_forest_model.pkl')
+file_path = 'models/random_forest_model.pkl'
+if os.path.exists(file_path):
+    print("File exists, loading the model...")
+    loaded_model = joblib.load(file_path)
+else:
+    print("Error: File not found!")
 
-MONGO_URI = "mongodb+srv://glycemicLoadMongo:qazQAZ@glycemicloadmongo.pckj1.mongodb.net/admin?appName=glycemicLoadMongo&retryWrites=true&loadBalanced=false&replicaSet=atlas-8bz6ha-shard-0&readPreference=primary&srvServiceName=mongodb&connectTimeoutMS=10000&w=majority&authSource=admin&authMechanism=SCRAM-SHA-1"
-DATABASE_NAME = "glycemicLoad_db"
-COLLECTION_NAME = "glycemicLoad_predictions"
+env_file = ".env"
+if os.path.exists(env_file):
+    load_dotenv(env_file)
+    print(f"Loaded environment variables from {env_file}")
+else:
+    print(f"Error: {env_file} file not found!")
+    exit(1)
 
-client = MongoClient(MONGO_URI)
-db = client[DATABASE_NAME]
-collection = db[COLLECTION_NAME]
+MONGO_URI = os.getenv("MONGO_URI")
+DATABASE_NAME = os.getenv("DATABASE_NAME")
+COLLECTION_NAME = os.getenv("COLLECTION_NAME") 
+
+if not all([MONGO_URI, DATABASE_NAME, COLLECTION_NAME]):
+    print("Error: Missing required environment variables!")
+    exit(1)
+
+try:
+    client = MongoClient(MONGO_URI)
+    db = client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
+    print("Connected to MongoDB successfully!")
+except Exception as e:
+    print(f"Failed to connect to MongoDB: {e}")
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Allow Angular local development
+    allow_origins=["http://localhost:4200"], 
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"], 
+    allow_headers=["*"],
 )
 
 class InputData(BaseModel):
