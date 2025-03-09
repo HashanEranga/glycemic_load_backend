@@ -44,7 +44,7 @@ router = APIRouter(prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://13.60.95.188:8000"], 
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"], 
     allow_headers=["*"],
