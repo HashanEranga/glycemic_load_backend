@@ -1,7 +1,7 @@
 import os
 import joblib
 import numpy as np
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import APIRouter, FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from typing import Dict
 from pymongo import MongoClient
@@ -40,6 +40,7 @@ except Exception as e:
     print(f"Failed to connect to MongoDB: {e}")
 
 app = FastAPI()
+router = APIRouter(prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,7 +55,7 @@ class InputData(BaseModel):
     portionSize: float
     nutrients: Dict[str, float]
 
-@app.post("/predict/")
+@router.post("/predict/")
 def predict(input_data: InputData):
     try:
         dividing_factor = input_data.portionSize/100
@@ -75,7 +76,7 @@ def predict(input_data: InputData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/retrieve/")
+@router.get("/retrieve/")
 def retrieve(foodName: str):
     try:
         all_records = list(collection.find({}, {"_id": 0}))
@@ -90,7 +91,7 @@ def retrieve(foodName: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/retrieve/all")
+@router.get("/retrieve/all")
 def retrieve_all():
     try:
         results = list(collection.find({}, {"_id": 0}))
@@ -101,3 +102,5 @@ def retrieve_all():
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+app.include_router(router)
