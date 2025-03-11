@@ -58,10 +58,11 @@ class InputData(BaseModel):
 @router.post("/predict/")
 def predict(input_data: InputData):
     try:
-        dividing_factor = input_data.portionSize/100
+        nutritient_factor = input_data.portionSize / 100
         X_input = np.array(list(input_data.nutrients.values()))
-        X_input = X_input/dividing_factor
+        X_input = X_input
         prediction = loaded_model.predict([X_input])[0].round(2)
+        prediction_per_food_portion = prediction * nutritient_factor
 
         record = {
             "foodName": input_data.foodName,
@@ -71,7 +72,7 @@ def predict(input_data: InputData):
         }
         collection.insert_one(record)
 
-        return {"foodName": input_data.foodName, "glycemicLoad": prediction}
+        return {"foodName": input_data.foodName, "glycemicLoad": prediction_per_food_portion}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
