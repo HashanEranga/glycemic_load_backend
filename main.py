@@ -68,7 +68,7 @@ def predict(input_data: InputData):
             "foodName": input_data.foodName,
             "portionSize": input_data.portionSize,
             "nutrients": input_data.nutrients,
-            "glycemicLoad": prediction,
+            "glycemicLoad": prediction_per_food_portion,
         }
         collection.insert_one(record)
 
