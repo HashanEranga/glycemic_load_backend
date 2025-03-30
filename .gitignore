@@ -1,3 +1,4 @@
 .env
 glycemicLoad
 __pycache__
+all_foods.csv

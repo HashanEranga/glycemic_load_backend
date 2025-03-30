@@ -26,8 +26,9 @@ else:
 MONGO_URI = os.getenv("MONGO_URI")
 DATABASE_NAME = os.getenv("DATABASE_NAME")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME") 
+GLYCEMIC_INDEX_COLLECTION = os.getenv("GLYCEMIC_INDEX_COLLECTION")
 
-if not all([MONGO_URI, DATABASE_NAME, COLLECTION_NAME]):
+if not all([MONGO_URI, DATABASE_NAME, COLLECTION_NAME, GLYCEMIC_INDEX_COLLECTION]):
     print("Error: Missing required environment variables!")
     exit(1)
 
@@ -35,6 +36,7 @@ try:
     client = MongoClient(MONGO_URI)
     db = client[DATABASE_NAME]
     collection = db[COLLECTION_NAME]
+    glycemic_index_collection = db[GLYCEMIC_INDEX_COLLECTION]
     print("Connected to MongoDB successfully!")
 except Exception as e:
     print(f"Failed to connect to MongoDB: {e}")
@@ -100,6 +102,32 @@ def retrieve_all():
             raise HTTPException(status_code=404, detail="No records found")
 
         return {"results": results}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/glycemicIndex/retrieve/all")
+def glycemicIndex_retrieve_all():
+    try:
+        results = list(glycemic_index_collection.find({}, {"_id":0}))
+        if not results:
+            raise HTTPException(status_code=404, detail="No records found")
+        return {"results": results}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/glycemicIndex/retrieve/")
+def glycemicIndex_retrieve(foodName: str):
+    try:
+        all_records = list(glycemic_index_collection.find({}, {"_id": 0}))
+
+        filtered_results = [record for record in all_records if foodName.lower() in record["foodName"].lower()]
+
+        if not filtered_results:
+            raise HTTPException(status_code=404, detail="No records found")
+
+        return {"results": filtered_results}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
