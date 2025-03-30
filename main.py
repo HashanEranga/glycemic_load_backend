@@ -131,5 +131,23 @@ def glycemicIndex_retrieve(foodName: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/mix-meal/retrieve/")
+def mixMeal_retrieve(foodName: str):
+    try:
+        all_records_from_saved = list(collection.find({}, {"_id": 0}))
+        all_records_from_glycemicIndex = list(glycemic_index_collection.find({}, {"_id": 0}))
+
+        all_records = all_records_from_saved + all_records_from_glycemicIndex
+
+        filtered_results = [record for record in all_records if foodName.lower() in record["foodName"].lower()]
+
+        if not filtered_results:
+            raise HTTPException(status_code=404, detail="No records found")
+
+        return {"results": filtered_results}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 app.include_router(router)
